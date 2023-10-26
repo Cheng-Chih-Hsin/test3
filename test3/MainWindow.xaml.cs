@@ -24,5 +24,10 @@ namespace test3
         {
             InitializeComponent();
         }
+
+        private void ShapeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
