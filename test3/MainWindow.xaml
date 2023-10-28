@@ -28,6 +28,8 @@
             </ToolBar>
         </ToolBarTray>
         <Canvas x:Name="myCanvas" Height="413" Background="#FFBFA2A2" DockPanel.Dock="Top" MouseLeftButtonDown="myCanvas_MouseLeftButtonDown" MouseMove="myCanvas_MouseMove"/>
-        <StatusBar Width="800" DockPanel.Dock="Top" Height="35" Background="#FF615F5F"/>
+        <StatusBar DockPanel.Dock="Top" Height="30" Background="#FF615F5F">
+            <Label x:Name="coordinateLbel" Height="25" VerticalAlignment="Center" Margin="100,0,0,0" Width="300"/>
+        </StatusBar>
     </DockPanel>
 </Window>

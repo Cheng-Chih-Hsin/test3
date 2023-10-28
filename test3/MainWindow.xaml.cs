@@ -35,11 +35,23 @@ namespace test3
         private void myCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             dest = e.GetPosition(myCanvas);
+            DisplayStatus();
+
+            switch (shapeType)
+            {
+                case "line":                  
+                    break;
+                case "rectangle":
+                    break;
+                case "ellipse":
+                    break;
+            }
         }
 
         private void myCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             start = e.GetPosition(myCanvas);
+            DisplayStatus();
 
             myCanvas.Cursor = Cursors.Cross;
             switch (shapeType)
@@ -52,6 +64,11 @@ namespace test3
                 case "ellipse":
                     break;
             }
+        }
+
+        private void DisplayStatus()
+        {
+            coordinateLbel.Content = $"座標點:({Math.Round(start.X)},{Math.Round(start.Y)}) - ({dest.X},{dest.Y})";
         }
 
         private void DrawLine(Color color, int thickness)
