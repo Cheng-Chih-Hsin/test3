@@ -20,6 +20,7 @@ namespace test3
         Color fillColor = Colors.Yellow;
         int strokeThickness = 1;
         Point start, dest;
+        string actionType = "draw";
         public MainWindow()
         {
             InitializeComponent();
@@ -36,40 +37,56 @@ namespace test3
 
         private void myCanvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            { 
             dest = e.GetPosition(myCanvas);
             DisplayStatus();
-                Point origin;
-                origin.X = Math.Min(start.X, dest.X);
-                origin.Y = Math.Min(start.Y, dest.Y);
-                double width = Math.Abs(start.X - dest.X);
-                double height = Math.Abs(start.Y - dest.Y);
 
-                switch (shapeType)
+            switch (actionType)
             {
-                case "line":
-                    var line = myCanvas.Children.OfType<Line>().LastOrDefault();
-                    line.X2 = dest.X;
-                    line.Y2 = dest.Y;
+                case "draw": //繪圖模式
+                    if (e.LeftButton == MouseButtonState.Pressed)
+                                { 
+
+                                    Point origin;
+                                    origin.X = Math.Min(start.X, dest.X);
+                                    origin.Y = Math.Min(start.Y, dest.Y);
+                                    double width = Math.Abs(start.X - dest.X);
+                                    double height = Math.Abs(start.Y - dest.Y);
+
+                                    switch (shapeType)
+                                {
+                                    case "line":
+                                        var line = myCanvas.Children.OfType<Line>().LastOrDefault();
+                                        line.X2 = dest.X;
+                                        line.Y2 = dest.Y;
+                                        break;
+                                    case "rectangle":
+                                            var rect = myCanvas.Children.OfType<Rectangle>().LastOrDefault();
+                                            rect.Width = width;
+                                            rect.Height = height;
+                                            rect.SetValue(Canvas.LeftProperty, origin.X);
+                                            rect.SetValue(Canvas.TopProperty, origin.Y);
+                                        break;
+                                    case "ellipse":
+                                            var ellipes = myCanvas.Children.OfType<Ellipse>().LastOrDefault();
+                                            ellipes.Width = width;
+                                            ellipes.Height = height;
+                                            ellipes.SetValue(Canvas.LeftProperty, origin.X);
+                                            ellipes.SetValue(Canvas.TopProperty, origin.Y);
+                                            break;
+                                    case "polyline":
+                                            var polyline = myCanvas.Children.OfType<Polyline>().LastOrDefault();
+                                            polyline.Points.Add(dest);
+                                            break;
+                                    }   
+                                }
                     break;
-                case "rectangle":
-                        var rect = myCanvas.Children.OfType<Rectangle>().LastOrDefault();
-                        rect.Width = width;
-                        rect.Height = height;
-                        rect.SetValue(Canvas.LeftProperty, origin.X);
-                        rect.SetValue(Canvas.TopProperty, origin.Y);
+                case "erase": //橡皮擦模式
+                    var shape = e.OriginalSource as Shape;
+                    myCanvas.Children.Remove(shape);
+                    if (myCanvas.Children.Count == 0) myCanvas.Cursor = Cursors.Arrow;
                     break;
-                case "ellipse":
-                        var ellipes = myCanvas.Children.OfType<Ellipse>().LastOrDefault();
-                        ellipes.Width = width;
-                        ellipes.Height = height;
-                        ellipes.SetValue(Canvas.LeftProperty, origin.X);
-                        ellipes.SetValue(Canvas.TopProperty, origin.Y);
-                        break;
-            }   
             }
-            
+                       
         }
 
         private void myCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -77,6 +94,8 @@ namespace test3
             start = e.GetPosition(myCanvas);
             DisplayStatus();
 
+            if (actionType == "draw")
+            {
             myCanvas.Cursor = Cursors.Cross;
             switch (shapeType)
             {
@@ -112,33 +131,58 @@ namespace test3
                     ellipes.SetValue(Canvas.LeftProperty, start.X);
                     ellipes.SetValue(Canvas.TopProperty, start.Y);
                     break;
+                case "polyline":
+                    Polyline polyline = new Polyline
+                    {
+                        Stroke = Brushes.Gray,
+                        Fill = Brushes.LightGray
+                    };
+                    myCanvas.Children.Add(polyline);
+                    break;
             }
         }
+            }
+            
 
         private void myCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             Brush strokeBrush = new SolidColorBrush(strokeColor);
             Brush fillBrush = new SolidColorBrush(fillColor);
-            switch (shapeType)
+
+            switch (actionType)
             {
-                case "line":
-                    var line = myCanvas.Children?.OfType<Line>().LastOrDefault();
-                    line.Stroke = strokeBrush;
-                    line.StrokeThickness = strokeThickness;
+                case "draw":
+                    switch (shapeType)
+                                {
+                                    case "line":
+                                        var line = myCanvas.Children.OfType<Line>().LastOrDefault();
+                                        line.Stroke = strokeBrush;
+                                        line.StrokeThickness = strokeThickness;
+                                        break;
+                                    case "rectangle":
+                                        var rect = myCanvas.Children.OfType<Rectangle>().LastOrDefault();
+                                        rect.Stroke = new SolidColorBrush(strokeColor);
+                                        rect.Fill = fillBrush;
+                                        rect.StrokeThickness = strokeThickness;
+                                        break;
+                                    case "ellipse":
+                                        var ellipse = myCanvas.Children.OfType<Ellipse>().LastOrDefault();
+                                        ellipse.Stroke = new SolidColorBrush(strokeColor);
+                                        ellipse.Fill = fillBrush;
+                                        ellipse.StrokeThickness = strokeThickness;
+                                        break;
+                                    case "polyline":
+                                        var polyline = myCanvas.Children.OfType<Polyline>().LastOrDefault();
+                                        polyline.Stroke = new SolidColorBrush(strokeColor);
+                                        polyline.Fill = fillBrush;
+                                        polyline.StrokeThickness = strokeThickness;
+                                        break;
+                                }
                     break;
-                case "rectangle":
-                    var rect = myCanvas.Children.OfType<Rectangle>().LastOrDefault();
-                    rect.Stroke = new SolidColorBrush(strokeColor);
-                    rect.Fill = fillBrush;
-                    rect.StrokeThickness = strokeThickness;
-                    break;
-                case "ellipse":
-                    var ellipse = myCanvas.Children.OfType<Ellipse>().LastOrDefault();
-                    ellipse.Stroke = new SolidColorBrush(strokeColor);
-                    ellipse.Fill = fillBrush;
-                    ellipse.StrokeThickness = strokeThickness;
+                case "erase":
                     break;
             }
+            
         }
 
         private void strokeColorPicter_SelectedColorChanged(object sender, RoutedPropertyChangedEventArgs<Color?> e)
@@ -162,13 +206,25 @@ namespace test3
             DisplayStatus();
         }
 
+        private void eraseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (myCanvas.Children.Count != 0) myCanvas.Cursor = Cursors.Hand;
+            actionType = "erase";
+        }
+
+        private void clearButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         private void DisplayStatus()
         {
             coordinateLbel.Content = $"座標點:({Math.Round(start.X)},{Math.Round(start.Y)}) - ({dest.X},{dest.Y})";
             int lineCount = myCanvas.Children.OfType<Line>().Count();
             int rectCount = myCanvas.Children.OfType<Rectangle>().Count();
             int ellipseCount = myCanvas.Children.OfType<Ellipse>().Count();
-            shapeLabelLbel.Content = $"Line: {lineCount}, Rectangle{rectCount}, Ellipse{ellipseCount}";
+            int polaylineCount = myCanvas.Children.OfType<Polyline>().Count();
+            shapeLabelLbel.Content = $"Line: {lineCount}, Rectangle: {rectCount}, Ellipse: {ellipseCount}, Polayline: {polaylineCount}";
         }
     }
 }
