@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 namespace test3
@@ -32,6 +35,7 @@ namespace test3
         {
             var targetRadioButton = sender as RadioButton;
             shapeType = targetRadioButton.Tag.ToString();
+            actionType = "draw";
             //MessageBox.Show(shapeType);
         }
 
@@ -200,12 +204,6 @@ namespace test3
             fillColor = (Color)fillColorPicter.SelectedColor;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            myCanvas.Children.Clear();
-            DisplayStatus();
-        }
-
         private void eraseButton_Click(object sender, RoutedEventArgs e)
         {
             if (myCanvas.Children.Count != 0) myCanvas.Cursor = Cursors.Hand;
@@ -214,7 +212,41 @@ namespace test3
 
         private void clearButton_Click(object sender, RoutedEventArgs e)
         {
+            myCanvas.Children.Clear();
+            DisplayStatus();
+        }
 
+        private void SaveCanvas_Click(object sender, RoutedEventArgs e)
+        {
+            // Show the SaveFileDialog to allow the user to choose the file name and location
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Title = "儲存畫布";
+            saveFileDialog.Filter = "Png檔案|*.png|所有檔案|*.*";
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // Create a RenderTargetBitmap to capture the canvas content
+                RenderTargetBitmap renderBitmap = new RenderTargetBitmap(
+                    (int)myCanvas.ActualWidth,
+                    (int)myCanvas.ActualHeight,
+                    64d, 64d, PixelFormats.Default);
+
+                // Render the canvas to the RenderTargetBitmap
+                renderBitmap.Render(myCanvas);
+
+                // Create a BitmapEncoder (e.g., PNGEncoder) to save the image
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(renderBitmap));
+
+                // Create a file stream using the user-selected file name
+                string fileName = saveFileDialog.FileName;
+                using (FileStream fs = new FileStream(fileName, FileMode.Create))
+                {
+                    encoder.Save(fs);
+                }
+
+                //MessageBox.Show($"Canvas content saved as {fileName}");
+            }
         }
 
         private void DisplayStatus()

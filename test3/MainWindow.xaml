@@ -11,9 +11,9 @@
         <Menu x:Name="clearMenuItem" Height="30" DockPanel.Dock="Top">
             <MenuItem Header="檔案" VerticalContentAlignment="Center" Height="25">
                 <MenuItem Header="新增畫布"/>
-                <MenuItem Header="開啟檔案"/>
+                <MenuItem Header="儲存畫布" Click="SaveCanvas_Click"/>
             </MenuItem>
-            <MenuItem Header="清除畫布" Click="MenuItem_Click"/>
+            <MenuItem Header="清除畫布" Click="clearButton_Click"/>
         </Menu>
         <ToolBarTray Height="40" DockPanel.Dock="Top">
             <ToolBar Height="38" Width="500" Background="#FFBDD7F5">
